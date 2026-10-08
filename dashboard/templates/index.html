@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--color-background-tertiary);color:var(--color-text-primary);font-family:var(--font-sans);font-size:14px;padding:16px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:16px}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.hdr-title{font-size:16px;font-weight:500}
+.hdr-sub{font-size:11px;color:var(--color-text-secondary)}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.pill{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;border:0.5px solid}
+.pill-green{background:#eaf3de;color:#3b6d11;border-color:#c0dd97}
+.pill-red{background:#fcebeb;color:#a32d2d;border-color:#f7c1c1}
+.pill-amber{background:#faeeda;color:#854f0b;border-color:#fac775}
+.pill-blue{background:#e6f1fb;color:#185fa5;border-color:#b5d4f4}
+@media(prefers-color-scheme:dark){
+  .pill-green{background:#27500a;color:#c0dd97;border-color:#3b6d11}
+  .pill-red{background:#501313;color:#f7c1c1;border-color:#791f1f}
+  .pill-amber{background:#412402;color:#fac775;border-color:#854f0b}
+  .pill-blue{background:#042c53;color:#b5d4f4;border-color:#185fa5}
+}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px}
+.stat-lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.stat-val{font-size:26px;font-weight:500;line-height:1}
+.stat-sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
+.v-red{color:#a32d2d}.v-amber{color:#854f0b}.v-blue{color:#185fa5}.v-green{color:#3b6d11}
+@media(prefers-color-scheme:dark){.v-red{color:#f7c1c1}.v-amber{color:#fac775}.v-blue{color:#b5d4f4}.v-green{color:#c0dd97}}
+.grid2{display:grid;grid-template-columns:1fr 320px;gap:12px;align-items:start}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:12px}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.card-hdr-left{display:flex;align-items:center;gap:8px;font-weight:500;font-size:13px}
+.ico{width:16px;height:16px;flex-shrink:0}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{font-size:11px;font-weight:500;color:var(--color-text-secondary);padding:8px 14px;text-align:left;border-bottom:0.5px solid var(--color-border-tertiary);text-transform:uppercase;letter-spacing:.4px}
+.tbl td{padding:9px 14px;border-bottom:0.5px solid var(--color-border-tertiary);vertical-align:middle;color:var(--color-text-secondary)}
+.tbl td:first-child{color:var(--color-text-primary);font-family:var(--font-mono);font-size:11px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--color-background-secondary)}
+.sev-badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;border:0.5px solid}
+.sev-CRITICAL{background:#fcebeb;color:#a32d2d;border-color:#f09595}
+.sev-HIGH{background:#faeeda;color:#854f0b;border-color:#ef9f27}
+.sev-MEDIUM{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
+.sev-LOW{background:#eaf3de;color:#3b6d11;border-color:#97c459}
+@media(prefers-color-scheme:dark){
+  .sev-CRITICAL{background:#501313;color:#f7c1c1;border-color:#791f1f}
+  .sev-HIGH{background:#412402;color:#fac775;border-color:#633806}
+  .sev-MEDIUM{background:#042c53;color:#b5d4f4;border-color:#0c447c}
+  .sev-LOW{background:#173404;color:#c0dd97;border-color:#27500a}
+}
+.msg-cell{max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{padding:32px 16px;text-align:center;color:var(--color-text-secondary);font-size:13px}
+.empty-ico{font-size:28px;display:block;margin-bottom:8px}
+.blocked-wrap{padding:12px 16px;display:flex;flex-wrap:wrap;gap:6px;min-height:52px}
+.blocked-tag{font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:4px;background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595}
+@media(prefers-color-scheme:dark){.blocked-tag{background:#501313;color:#f7c1c1;border-color:#791f1f}}
+.arp-ip{font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary)}
+.arp-mac{font-family:var(--font-mono);font-size:11px;color:var(--color-text-secondary)}
+.cfg-row{display:flex;justify-content:space-between;align-items:center;padding:9px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.cfg-row:last-child{border-bottom:none}
+.cfg-key{font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.4px}
+.cfg-val{font-family:var(--font-mono);font-size:12px;color:var(--color-text-primary)}
+.ml-row{display:flex;align-items:center;gap:10px;padding:6px 16px}
+.ml-lbl{font-size:11px;color:var(--color-text-secondary);width:80px;flex-shrink:0}
+.ml-track{flex:1;height:5px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.ml-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.ml-pct{font-size:11px;color:var(--color-text-secondary);font-family:var(--font-mono);width:32px;text-align:right}
+.ml-section{padding:8px 0 12px}
+.time-col{font-family:var(--font-mono);font-size:10px;white-space:nowrap}
+.type-col{font-family:var(--font-mono);font-size:10px;white-space:nowrap;color:var(--color-text-primary)}
+.refresh-note{font-size:11px;color:var(--color-text-secondary);padding:8px 16px;border-top:0.5px solid var(--color-border-tertiary)}
+.chart-wrap{position:relative;width:100%;height:120px;padding:12px 16px 8px}
+.pulse-row{display:flex;align-items:center;gap:6px;padding:4px 16px 12px;font-size:11px;color:var(--color-text-secondary)}
+</style>
+</head>
+<body>
+
+<h2 class="sr-only">CyberShield — AI-powered network defense dashboard showing live security alerts, blocked IPs, and system status.</h2>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="dot"></div>
+    <div>
+      <div class="hdr-title">CyberShield — Defense Agent</div>
+      <div class="hdr-sub">Autonomous MITM Detection &amp; Response System</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="pill pill-blue" id="sysTime">--:--:--</span>
+    <span class="pill pill-green" id="threatPill">Threat: low</span>
+    <span class="pill pill-green" id="statusPill">Online</span>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-lbl">Total alerts</div>
+    <div class="stat-val v-blue" id="sTotal">0</div>
+    <div class="stat-sub">All events</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">Critical</div>
+    <div class="stat-val v-red" id="sCrit">0</div>
+    <div class="stat-sub">ARP / DNS spoof</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">High</div>
+    <div class="stat-val v-amber" id="sHigh">0</div>
+    <div class="stat-sub">Scans / floods</div>
+  </div>
+  <div class="stat">
+    <div class="stat-lbl">Blocked IPs</div>
+    <div class="stat-val v-red" id="sBlocked">0</div>
+    <div class="stat-sub">Iptables drop</div>
+  </div>
+</div>
+
+<div class="grid2">
+
+  <div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <svg class="ico" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v5c0 3.3 2.5 6.4 6 7.2 3.5-.8 6-3.9 6-7.2V4L8 1z" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Live alert feed
+        </div>
+        <span class="pill pill-red" id="alertCount">0 alerts</span>
+      </div>
+      <div id="alertTableWrap">
+        <div class="empty"><span class="empty-ico">🛡</span>No threats detected — system monitoring active</div>
+      </div>
+      <div class="refresh-note" id="lastRefresh">Last refreshed: —</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <svg class="ico" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Packet stream
+        </div>
+        <span class="pill pill-blue" id="pktRate">0 pkt/s</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="trafficChart" role="img" aria-label="Live network packet rate over time">Packet rate chart</canvas>
+      </div>
+      <div class="pulse-row">
+        <div class="dot" style="width:6px;height:6px"></div>
+        <span>BPF filter active — capturing ARP + UDP port 53 on <span id="ifaceLabel">eth0</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <svg class="ico" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          ML detection engine
+        </div>
+        <span class="pill pill-green">Active</span>
+      </div>
+      <div class="ml-section">
+        <div class="ml-row"><span class="ml-lbl">ARP spoof</span><div class="ml-track"><div class="ml-fill" style="width:96%;background:#a32d2d"></div></div><span class="ml-pct v-red">96%</span></div>
+        <div class="ml-row"><span class="ml-lbl">DNS spoof</span><div class="ml-track"><div class="ml-fill" style="width:94%;background:#854f0b"></div></div><span class="ml-pct v-amber">94%</span></div>
+        <div class="ml-row"><span class="ml-lbl">Port scan</span><div class="ml-track"><div class="ml-fill" style="width:98%;background:#185fa5"></div></div><span class="ml-pct v-blue">98%</span></div>
+        <div class="ml-row"><span class="ml-lbl">Flood</span><div class="ml-track"><div class="ml-fill" style="width:97%;background:#3b6d11"></div></div><span class="ml-pct v-green">97%</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <svg class="ico" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M8 5.5v3M8 10v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Blocked IPs
+        </div>
+        <span class="pill pill-red" id="blockedCountPill">0 blocked</span>
+      </div>
+      <div class="blocked-wrap" id="blockedWrap">
+        <span style="font-size:12px;color:var(--color-text-secondary)">No IPs blocked yet</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <svg class="ico" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.2"/></svg>
+          Trusted ARP table
+        </div>
+        <span class="pill pill-green" id="arpCountPill">0 hosts</span>
+      </div>
+      <div style="overflow:auto;max-height:180px">
+        <table class="tbl">
+          <thead><tr><th>IP address</th><th>MAC address</th><th>Status</th></tr></thead>
+          <tbody id="arpBody"><tr><td colspan="3" style="text-align:center;padding:16px;color:var(--color-text-secondary)">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <svg class="ico" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          System config
+        </div>
+        <span class="pill pill-green">Running</span>
+      </div>
+      <div id="cfgBody"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const C = {
+  red:   isDark ? '#f7c1c1' : '#a32d2d',
+  amber: isDark ? '#fac775' : '#854f0b',
+  blue:  isDark ? '#b5d4f4' : '#185fa5',
+  green: isDark ? '#c0dd97' : '#3b6d11',
+  grid:  isDark ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.07)',
+  line:  isDark ? '#b5d4f4' : '#185fa5',
+  fill:  isDark ? 'rgba(24,95,165,.15)' : 'rgba(24,95,165,.08)',
+  txt:   isDark ? '#9aa0a6' : '#6b7280',
+};
+
+const pktLabels = Array(30).fill('');
+const pktData   = Array(30).fill(0);
+let   pktChart;
+
+function initChart() {
+  const ctx = document.getElementById('trafficChart').getContext('2d');
+  pktChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: pktLabels,
+      datasets: [{
+        data: pktData,
+        borderColor: C.line,
+        backgroundColor: C.fill,
+        borderWidth: 1.5,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 300 },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: {
+        x: { display: false },
+        y: {
+          min: 0,
+          ticks: { color: C.txt, font: { size: 10 }, maxTicksLimit: 4,
+                   callback: v => Math.round(v) },
+          grid: { color: C.grid },
+          border: { display: false }
+        }
+      }
+    }
+  });
+}
+
+function pushPkt(v) {
+  pktData.push(Math.round(v));
+  pktData.shift();
+  pktChart.update('none');
+  document.getElementById('pktRate').textContent = Math.round(v) + ' pkt/s';
+}
+
+function tick() {
+  const t = Date.now() / 1000;
+  const v = 8 + Math.sin(t*1.1)*4 + Math.sin(t*2.3)*2 + Math.random()*3;
+  pushPkt(Math.max(0, v));
+}
+
+function clock() {
+  document.getElementById('sysTime').textContent =
+    new Date().toTimeString().slice(0,8);
+}
+
+function sev(s) {
+  const m = {CRITICAL:'Critical',HIGH:'High',MEDIUM:'Medium',LOW:'Low'};
+  return m[s] || s || 'Low';
+}
+
+function renderAlerts(alerts) {
+  const wrap = document.getElementById('alertTableWrap');
+  document.getElementById('alertCount').textContent = alerts.length + ' alerts';
+  document.getElementById('lastRefresh').textContent =
+    'Last refreshed: ' + new Date().toTimeString().slice(0,8);
+
+  if (!alerts.length) {
+    wrap.innerHTML = '<div class="empty"><span class="empty-ico">🛡</span>No threats detected — system monitoring active</div>';
+    return;
+  }
+  let rows = '';
+  alerts.slice(0,25).forEach(a => {
+    const s   = a.severity || 'LOW';
+    const typ = a.type || a.action || '—';
+    const msg = (a.message || a.detail || '').slice(0,80) + ((a.message||'').length>80?'…':'');
+    const ts  = (a.timestamp||'').slice(11,19);
+    rows += `<tr>
+      <td class="time-col">${ts}</td>
+      <td class="type-col">${typ}</td>
+      <td><span class="sev-badge sev-${s}">${sev(s)}</span></td>
+      <td class="msg-cell">${msg}</td>
+    </tr>`;
+  });
+  wrap.innerHTML = `<div style="overflow:auto"><table class="tbl">
+    <thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Message</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderStats(alerts) {
+  let crit=0, high=0;
+  alerts.forEach(a => {
+    if (a.severity==='CRITICAL') crit++;
+    if (a.severity==='HIGH')     high++;
+  });
+  document.getElementById('sTotal').textContent = alerts.length;
+  document.getElementById('sCrit').textContent  = crit;
+  document.getElementById('sHigh').textContent  = high;
+
+  const pill = document.getElementById('threatPill');
+  if (crit > 0)      { pill.textContent='Threat: critical'; pill.className='pill pill-red'; }
+  else if (high > 0) { pill.textContent='Threat: high';     pill.className='pill pill-amber'; }
+  else               { pill.textContent='Threat: low';      pill.className='pill pill-green'; }
+}
+
+function renderBlocked(ips) {
+  document.getElementById('sBlocked').textContent      = ips.length;
+  document.getElementById('blockedCountPill').textContent = ips.length + ' blocked';
+  const wrap = document.getElementById('blockedWrap');
+  if (!ips.length) {
+    wrap.innerHTML = '<span style="font-size:12px;color:var(--color-text-secondary)">No IPs blocked yet</span>';
+    return;
+  }
+  wrap.innerHTML = ips.map(ip => `<span class="blocked-tag">${ip}</span>`).join('');
+}
+
+function renderARP(table) {
+  const entries = Object.entries(table);
+  document.getElementById('arpCountPill').textContent = entries.length + ' hosts';
+  const body = document.getElementById('arpBody');
+  if (!entries.length) {
+    body.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--color-text-secondary)">Building table...</td></tr>';
+    return;
+  }
+  body.innerHTML = entries.map(([ip,mac]) => `
+    <tr>
+      <td class="arp-ip">${ip}</td>
+      <td class="arp-mac">${mac}</td>
+      <td><span class="sev-badge sev-LOW">Trusted</span></td>
+    </tr>`).join('');
+}
+
+function renderCfg(s) {
+  const keys = {interface:'Interface',auto_block:'Auto block',trusted_dns:'Trusted DNS',gateway_ip:'Gateway',status:'Status'};
+  const el = document.getElementById('cfgBody');
+  el.innerHTML = Object.entries(s).map(([k,v]) =>
+    `<div class="cfg-row"><span class="cfg-key">${keys[k]||k}</span><span class="cfg-val">${v}</span></div>`
+  ).join('');
+  if (s.interface) {
+    document.getElementById('ifaceLabel').textContent = s.interface;
+  }
+}
+
+async function fetchAll() {
+  try {
+    const [ra, rb, rc, rd] = await Promise.all([
+      fetch('/api/alerts'), fetch('/api/blocked'),
+      fetch('/api/arp_table'), fetch('/api/status')
+    ]);
+    const [alerts, blocked, arp, status] = await Promise.all([
+      ra.json(), rb.json(), rc.json(), rd.json()
+    ]);
+    renderAlerts(alerts);
+    renderStats(alerts);
+    renderBlocked(blocked);
+    renderARP(arp);
+    renderCfg(status);
+    document.getElementById('statusPill').textContent = 'Online';
+    document.getElementById('statusPill').className   = 'pill pill-green';
+  } catch(e) {
+    document.getElementById('statusPill').textContent = 'Offline';
+    document.getElementById('statusPill').className   = 'pill pill-red';
+  }
+}
+
+initChart();
+setInterval(tick,   1000);
+setInterval(clock,  1000);
+setInterval(fetchAll, 3000);
+clock();
+fetchAll();
+</script>
+</body>
+</html>
+

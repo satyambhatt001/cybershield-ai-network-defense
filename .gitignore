@@ -1,0 +1,33 @@
+# Python virtual environment — never push this (huge, not needed)
+venv/
+env/
+.env/
+
+# Python compiled files — auto-generated, not needed
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
+
+# ML model — too large for GitHub (300KB ok, but let's exclude)
+# ml/model.pkl
+
+# Data files — contain real network info (privacy)
+data/alerts.log
+data/traffic.log
+data/arp_table.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sensitive config (if you add passwords/keys later)
+secrets.py
+.env

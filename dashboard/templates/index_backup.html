@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Defense Agent</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    /* ── Header ───────────────────────────────────────── */
+    header {
+      background: #161b22;
+      padding: 16px 24px;
+      border-bottom: 2px solid #58a6ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { color: #58a6ff; font-size: 1.2rem; }
+    .live-badge {
+      background: #3fb950;
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.6; }
+    }
+
+    /* ── Stats Bar ────────────────────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 16px;
+      background: #010409;
+    }
+    .stat-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #58a6ff;
+    }
+    .stat-number.danger { color: #f85149; }
+    .stat-number.warn   { color: #e3b341; }
+    .stat-number.ok     { color: #3fb950; }
+    .stat-label {
+      font-size: 0.72rem;
+      color: #8b949e;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+
+    /* ── Main Grid ────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card h2 {
+      font-size: 0.8rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    /* ── Alert Items ──────────────────────────────────── */
+    .alert-item {
+      padding: 10px 12px;
+      margin: 6px 0;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    .CRITICAL { background:#2d1010; border-left:4px solid #f85149; }
+    .HIGH     { background:#2d1e00; border-left:4px solid #e3b341; }
+    .MEDIUM   { background:#0d1929; border-left:4px solid #58a6ff; }
+    .LOW      { background:#0d1a0d; border-left:4px solid #3fb950; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.68rem;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .badge.CRITICAL { background:#f85149; color:#fff; }
+    .badge.HIGH     { background:#e3b341; color:#000; }
+    .badge.MEDIUM   { background:#58a6ff; color:#000; }
+    .badge.LOW      { background:#3fb950; color:#000; }
+
+    .alert-time {
+      color: #8b949e;
+      font-size: 0.7rem;
+      float: right;
+    }
+    .alert-msg { margin-top: 4px; color: #c9d1d9; }
+
+    /* ── Tables ───────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    th {
+      text-align: left;
+      padding: 6px 8px;
+      color: #8b949e;
+      border-bottom: 1px solid #30363d;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 7px 8px;
+      border-bottom: 1px solid #21262d;
+      color: #c9d1d9;
+    }
+    tr:hover td { background: #1c2128; }
+
+    /* ── Status items ─────────────────────────────────── */
+    .status-val { color: #3fb950; }
+    .blocked-ip {
+      display: inline-block;
+      background: #2d1010;
+      border: 1px solid #f85149;
+      color: #f85149;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin: 3px;
+      font-size: 0.75rem;
+    }
+    #no-alerts {
+      color: #3fb950;
+      text-align: center;
+      padding: 30px;
+      font-size: 1rem;
+    }
+    .scroll-box {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .scroll-box::-webkit-scrollbar { width: 4px; }
+    .scroll-box::-webkit-scrollbar-track { background: #0d1117; }
+    .scroll-box::-webkit-scrollbar-thumb { background: #30363d; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <h1>🛡 AI-Powered Cyber Defense Agent</h1>
+  <span class="live-badge">● LIVE MONITORING</span>
+</header>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-number danger" id="stat-critical">0</div>
+    <div class="stat-label">Critical Alerts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number warn" id="stat-high">0</div>
+    <div class="stat-label">High Alerts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" id="stat-total">0</div>
+    <div class="stat-label">Total Alerts</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number danger" id="stat-blocked">0</div>
+    <div class="stat-label">Blocked IPs</div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<div class="grid">
+
+  <!-- Left: Alert Feed -->
+  <div class="card">
+    <h2>⚠ Live Security Alerts</h2>
+    <div class="scroll-box" id="alerts-container">
+      <div id="no-alerts">✅ No alerts yet — network looks clean</div>
+    </div>
+  </div>
+
+  <!-- Right: Info panels -->
+  <div>
+
+    <!-- Blocked IPs -->
+    <div class="card" style="margin-bottom:16px">
+      <h2>🚫 Blocked IPs</h2>
+      <div id="blocked-container">
+        <span style="color:#8b949e">No IPs blocked yet</span>
+      </div>
+    </div>
+
+    <!-- ARP Table -->
+    <div class="card" style="margin-bottom:16px">
+      <h2>📋 Trusted ARP Table</h2>
+      <div class="scroll-box">
+        <table>
+          <thead>
+            <tr><th>IP Address</th><th>MAC Address</th></tr>
+          </thead>
+          <tbody id="arp-body">
+            <tr><td colspan="2" style="color:#8b949e">
+              Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="card">
+      <h2>⚙ System Status</h2>
+      <table>
+        <tbody id="status-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Fetch and render alerts ──────────────────────────────
+  function loadAlerts() {
+    fetch('/api/alerts')
+      .then(r => r.json())
+      .then(alerts => {
+        const container = document.getElementById('alerts-container');
+
+        if (alerts.length === 0) {
+          container.innerHTML =
+            '<div id="no-alerts">✅ No alerts — network is clean</div>';
+          return;
+        }
+
+        // Count by severity for stats bar
+        let critical = 0, high = 0;
+        alerts.forEach(a => {
+          if (a.severity === 'CRITICAL') critical++;
+          if (a.severity === 'HIGH') high++;
+        });
+
+        document.getElementById('stat-critical').textContent = critical;
+        document.getElementById('stat-high').textContent = high;
+        document.getElementById('stat-total').textContent = alerts.length;
+
+        // Render alert items
+        container.innerHTML = alerts.map(a => `
+          <div class="alert-item ${a.severity || 'MEDIUM'}">
+            <span class="badge ${a.severity || 'MEDIUM'}">
+              ${a.type || 'ALERT'}
+            </span>
+            <span class="alert-time">${
+              (a.timestamp || '').substring(11, 19)
+            }</span>
+            <div class="alert-msg">${a.message || a.detail || ''}</div>
+          </div>
+        `).join('');
+      })
+      .catch(() => {});
+  }
+
+  // ── Fetch blocked IPs ────────────────────────────────────
+  function loadBlocked() {
+    fetch('/api/blocked')
+      .then(r => r.json())
+      .then(ips => {
+        const c = document.getElementById('blocked-container');
+        document.getElementById('stat-blocked').textContent = ips.length;
+        if (ips.length === 0) {
+          c.innerHTML = '<span style="color:#8b949e">None</span>';
+        } else {
+          c.innerHTML = ips.map(ip =>
+            `<span class="blocked-ip">🚫 ${ip}</span>`
+          ).join('');
+        }
+      })
+      .catch(() => {});
+  }
+
+  // ── Fetch ARP table ──────────────────────────────────────
+  function loadARP() {
+    fetch('/api/arp_table')
+      .then(r => r.json())
+      .then(table => {
+        const entries = Object.entries(table);
+        document.getElementById('arp-body').innerHTML =
+          entries.length === 0
+            ? '<tr><td colspan="2" style="color:#8b949e">Empty</td></tr>'
+            : entries.map(([ip, mac]) =>
+                `<tr><td>${ip}</td><td>${mac}</td></tr>`
+              ).join('');
+      })
+      .catch(() => {});
+  }
+
+  // ── Fetch system status ──────────────────────────────────
+  function loadStatus() {
+    fetch('/api/status')
+      .then(r => r.json())
+      .then(s => {
+        document.getElementById('status-body').innerHTML =
+          Object.entries(s).map(([k, v]) => `
+            <tr>
+              <td style="color:#8b949e">${k}</td>
+              <td class="status-val">${v}</td>
+            </tr>
+          `).join('');
+      })
+      .catch(() => {});
+  }
+
+  // ── Load everything on page open ────────────────────────
+  loadAlerts();
+  loadBlocked();
+  loadARP();
+  loadStatus();
+
+  // ── Auto-refresh every 5 seconds ────────────────────────
+  setInterval(() => {
+    loadAlerts();
+    loadBlocked();
+  }, 5000);
+
+  setInterval(() => {
+    loadARP();
+    loadStatus();
+  }, 30000);
+</script>
+
+</body>
+</html>
